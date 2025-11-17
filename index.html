@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Degen Beacon - WebApp</title>
+  </head>
+  <script>
+
+const DEGEN_SERVICE_UUID = '033c3d34-8405-46db-8326-07169d5353a9';
+const WIFI_NAME_CHARACTERISTIC_UUID = '033c3d35-8405-46db-8326-07169d5353a9';
+const WIFI_PASSWORD_CHARACTERISTIC_UUID = '033c3d36-8405-46db-8326-07169d5353a9';
+
+function onConnectButtonClick() {
+    console.log("Connect button clicked");
+    navigator.bluetooth.requestDevice({
+        filters: [
+            {namePrefix: 'DegenBeacon'},
+        ],
+        optionalServices: [DEGEN_SERVICE_UUID],
+    })
+    .then(device => {
+        device.gatt.connect().then(server => {
+            console.log("GATT Server connected:", server);
+            console.log(device);
+            document.getElementById("status").innerText = "Connected to " + device.name;
+            return server.getPrimaryService(DEGEN_SERVICE_UUID);
+        }).then(service => {
+            console.log("Degen Service found:", service);
+            return Promise.all([
+                service.getCharacteristic(WIFI_NAME_CHARACTERISTIC_UUID),
+                service.getCharacteristic(WIFI_PASSWORD_CHARACTERISTIC_UUID)
+            ]);
+        }).then(characteristics => {
+            const wifiNameCharacteristic = characteristics[0];
+            const wifiPasswordCharacteristic = characteristics[1];
+
+            document.getElementById("sendWifiButton").onclick = function() {
+                Promise.all([
+                    wifiNameCharacteristic.writeValueWithResponse(new TextEncoder().encode(document.getElementById("wifiName").value)),
+                    wifiPasswordCharacteristic.writeValueWithResponse(new TextEncoder().encode(document.getElementById("wifiPassword").value))
+                ]).then(() => {
+                    alert("WiFi Credentials Sent!");
+                }).catch(error => {
+                    console.error("Error sending WiFi credentials:", error);
+                    alert("Error sending WiFi credentials: " + error);
+                });
+            }
+
+            return Promise.all([
+                wifiNameCharacteristic.readValue().then(value => {
+                    const decoder = new TextDecoder('utf-8');
+                    const wifiName = decoder.decode(value);
+                    console.log("WiFi Name read:", wifiName);
+                    return wifiName;
+                }),
+                wifiPasswordCharacteristic.readValue().then(value => {
+                    const decoder = new TextDecoder('utf-8');
+                    const wifiPassword = decoder.decode(value);
+                    console.log("WiFi Password read:", wifiPassword);
+                    return wifiPassword;
+                })
+            ]);
+        }).then(characteristics => {
+            const wifiName = characteristics[0];
+            const wifiPassword = characteristics[1];
+
+            document.getElementById("settings").style.display = "block";
+            document.getElementById("wifiName").value = wifiName;
+            document.getElementById("wifiPassword").value = wifiPassword;
+        }).catch(error => {
+            console.error("Error during GATT operations:", error);
+            alert("Error: " + error);
+        });
+    })
+}
+  </script>
+  <body>
+    <h1>Degen Beacon WebApp</h1>
+
+    <p>Status: <span id="status">Disconnected</span></p>
+
+    <p><button onclick="onConnectButtonClick()" id="connectButton">Connect to Beacon</button></p>
+
+    <div style="display: none" id="settings">
+        <label for="wifiName">WiFi SSID Name:</label>
+        <input type="text" id="wifiName" name="wifiName">
+        <label for="wifiPassword">WiFi Password:</label>
+        <input type="password" id="wifiPassword" name="wifiPassword">
+        <button id="sendWifiButton">Send WiFi Credentials</button>
+    </div>
+  </body>
+</html>
