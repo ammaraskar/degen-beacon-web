@@ -1,52 +1,37 @@
 import PWABadge from './PWABadge.tsx'
 import './App.css'
 import CssBaseline from '@mui/material/CssBaseline';
-import Card from '@mui/material/Card';
-import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import { Button, CardContent, CardHeader, Tabs, TextField, Tooltip, Typography } from '@mui/material';
-import Bluetooth from '@mui/icons-material/Bluetooth';
-import NetworkWifi from '@mui/icons-material/NetworkWifi';
+import React from 'react';
+import type BeaconState from './BeaconState.tsx';
+import ConnectCard from './ConnectCard.tsx';
+import Typography from '@mui/material/Typography';
+
 
 function App() {
+  const [beacon, setBeacon] = React.useState<BeaconState>({ connected: false });
+
   return (
     <>
       <CssBaseline />
-      <ConnectCard />
+      {!beacon.connected && <ConnectCard setBeacon={setBeacon} />}
+      {beacon.connected && <DeviceMenu beacon={beacon} />}
       <PWABadge />
     </>
   )
 }
 
-function ConnectCard() {
+function DeviceMenu({ beacon }: { beacon: BeaconState }) {
   return (
-      <Card sx={{ padding: '1em', minWidth: '300px', maxWidth: '600px' }} variant="outlined">
-        <CardHeader title={
-          <Typography component="h1" variant="h4">
-            Connect Beacon
-          </Typography>
-        } />
-        <CardContent>
-          <Tabs>
-            <Tab icon={<NetworkWifi />} label="WiFi" />
-            <Tooltip placement="top" title="Bluetooth connection is not supported yet" arrow>
-              <span>
-                <Tab disabled icon={<Bluetooth />} label="Bluetooth" />
-              </span>
-            </Tooltip>
-          </Tabs>
-
-          <Typography align='left' sx={{margin: '1em'}} variant="body1" gutterBottom>
-            Select <i>Pair with Terminal</i> on your beacon to grab its IP address.
-            Make sure it's connected to the same WiFi network as this device.
-          </Typography>
-          <Box>
-            <TextField size='small' id="outlined-basic" label="Beacon IP Address" variant="outlined" />
-            <Button variant="contained" sx={{ marginLeft: '1em' }}>Connect</Button>
-          </Box>
-
-        </CardContent>
-      </Card>
+    <Box sx={{ padding: '1em' }}>
+      <Typography color="text.secondary" component="h1" variant="h4">
+        Device Menu
+      </Typography>
+      <Typography sx={{ marginTop: '1em' }}>
+        Connected to device: {beacon.initialDeviceInformation?.DeviceName} (ID: {beacon.initialDeviceInformation?.DeviceID})
+        Firmware: {beacon.initialDeviceInformation?.FirmwareVersion}, Hardware: {beacon.initialDeviceInformation?.HardwareVersion}
+      </Typography>
+    </Box>
   )
 }
 
