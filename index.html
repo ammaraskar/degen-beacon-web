@@ -1,105 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Degen Beacon - WebApp</title>
+    <meta charset="UTF-8" />
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>degen-beacon-web + TS</title>
   </head>
-  <script>
-
-const DEGEN_SERVICE_UUID = '033c3d34-8405-46db-8326-07169d5353a9';
-const WIFI_NAME_CHARACTERISTIC_UUID = '033c3d35-8405-46db-8326-07169d5353a9';
-const WIFI_PASSWORD_CHARACTERISTIC_UUID = '033c3d36-8405-46db-8326-07169d5353a9';
-
-function onConnectButtonClick() {
-    console.log("Connect button clicked");
-    navigator.bluetooth.requestDevice({
-        filters: [
-            {namePrefix: 'DegenBeacon'},
-        ],
-        optionalServices: [DEGEN_SERVICE_UUID],
-    })
-    .then(device => {
-        // Wait until we are connected to the device.
-        device.gatt.connect().then(server => {
-            console.log("Gatt connected: ", server.connected);
-
-            console.log("GATT Server connected:", server);
-            console.log(device);
-            return server.getPrimaryService(DEGEN_SERVICE_UUID);
-        }).then(service => {
-            window.service = service;
-
-            console.log("Degen Service found:", service);
-            return service.getCharacteristic(WIFI_NAME_CHARACTERISTIC_UUID);
-        }).then(nameCharacteristic => {
-            document.getElementById("status").innerText = "Connected to " + device.name;
-            console.log("Got name Characteristic:", nameCharacteristic);
-
-            window.wifiNameCharacteristic = nameCharacteristic;
-            return service.getCharacteristic(WIFI_PASSWORD_CHARACTERISTIC_UUID);
-        }).then(wifiPasswordCharacteristic => {
-            console.log("Got password Characteristic:", wifiPasswordCharacteristic);
-            window.wifiPasswordCharacteristic = wifiPasswordCharacteristic;
-
-            const wifiNameCharacteristic = window.wifiNameCharacteristic;
-
-            document.getElementById("sendWifiButton").onclick = function() {
-                Promise.all([
-                    wifiNameCharacteristic.writeValueWithResponse(new TextEncoder().encode(document.getElementById("wifiName").value)),
-                    wifiPasswordCharacteristic.writeValueWithResponse(new TextEncoder().encode(document.getElementById("wifiPassword").value))
-                ]).then(() => {
-                    alert("WiFi Credentials Sent!");
-                }).catch(error => {
-                    console.error("Error sending WiFi credentials:", error);
-                    alert("Error sending WiFi credentials: " + error);
-                });
-            }
-
-            document.getElementById("connectButton").onclick = readWifi;
-            document.getElementById("connectButton").innerText = "Read WiFi Credentials";
-        }).catch(error => {
-            console.error("Error during GATT operations:", error);
-            alert("Error: " + error);
-        });
-    })
-}
-
-function readWifi() {
-    console.log("Reading WiFi Name...");
-
-    wifiNameCharacteristic.readValue().then(value => {
-        const decoder = new TextDecoder('utf-8');
-        const wifiName = decoder.decode(value);
-        console.log("WiFi Name read:", wifiName);
-        
-        document.getElementById("wifiName").value = wifiName;
-
-        return wifiPasswordCharacteristic.readValue();
-    }).then(value => {
-        const decoder = new TextDecoder('utf-8');
-        const wifiPassword = decoder.decode(value);
-        console.log("WiFi Password read:", wifiPassword);
-        
-        document.getElementById("wifiPassword").value = wifiPassword;
-
-        document.getElementById("settings").style.display = "block";
-    });
-}
-  </script>
   <body>
-    <h1>Degen Beacon WebApp</h1>
-
-    <p>Status: <span id="status">Disconnected. Go to "Main Menu" and press "Pair Bluetooth"</span></p>
-
-    <p><button onclick="onConnectButtonClick()" id="connectButton">Connect to Beacon</button></p>
-
-    <div style="display: none" id="settings">
-        <label for="wifiName">WiFi SSID Name:</label>
-        <input type="text" id="wifiName" name="wifiName">
-        <label for="wifiPassword">WiFi Password:</label>
-        <input type="password" id="wifiPassword" name="wifiPassword">
-        <button id="sendWifiButton">Send WiFi Credentials</button>
-    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
