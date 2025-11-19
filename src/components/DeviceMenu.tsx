@@ -21,17 +21,24 @@ export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
     setTabValue(newValue);
   };
 
+  const tabs = [
+    { icon: <Message />, label: "Messages", component: <>messages</> },
+    { icon: <PinDrop />, label: "Locations", component: <>locations</> },
+    { icon: <Settings />, label: "Settings", component: <>settings</> },
+    { icon: <SystemUpdateAlt />, label: "Firmware", component: <>firmware</> },
+  ];
+
   return (
     <>
       <DeviceInfoToolbar deviceInfo={deviceInfo} />
 
-      <Container sx={{ maxWidth: '600px', mt: 2}}>
+      <Container maxWidth="sm" sx={{ mt: 2}}>
         <Tabs value={tabValue} onChange={handleTabChange} centered>
-          <Tab icon={<Message />} label="Messages" />
-          <Tab icon={<PinDrop />} label="Locations" />
-          <Tab icon={<Settings />} label="Settings" />
-          <Tab icon={<SystemUpdateAlt />} label="Firmware" />
+          {tabs.map((tab, index) => (
+            <Tab key={index} icon={tab.icon} label={tab.label} />
+          ))}
         </Tabs>
+        {tabs[tabValue].component}
       </Container>
     </>
   )
