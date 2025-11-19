@@ -1,92 +1,101 @@
 import Box from "@mui/material/Box";
 import type { DeviceInformation } from "../beacon-rpc/RpcInterface";
 import Typography from "@mui/material/Typography";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
 
 export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
   return (
-    <Box sx={{ padding: '2em', maxWidth: '800px', margin: '0 auto' }}>
-      <Typography 
-        color="text.primary" 
-        component="h1" 
-        variant="h4" 
-        sx={{ marginBottom: '1.5em', fontWeight: 600 }}
-      >
-        Device Information
-      </Typography>
-      
-      <Card elevation={3}>
-        <CardContent>
-          <Stack spacing={3}>
-            {/* Device Image */}
-            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '1em' }}>
-              {deviceInfo.HardwareVersion === 1 && (
-                <img 
-                  width={200} 
-                  src='./v1-icon.png' 
-                  alt="Hardware Version 1"
-                  style={{ borderRadius: '8px' }}
-                />
-              )}
-              {deviceInfo.HardwareVersion === 2 && (
-                <img 
-                  width={200} 
-                  src='./v2-icon.png' 
-                  alt="Hardware Version 2"
-                  style={{ borderRadius: '8px' }}
-                />
-              )}
-            </Box>
+    <>
+      <DeviceInfoToolbar deviceInfo={deviceInfo} />
+    </>
+  )
+}
 
-            <Divider />
+function DeviceInfoToolbar({ deviceInfo }: { deviceInfo: DeviceInformation }) {
+  return (
+    <Box textAlign='center'>
+      <Paper elevation={2}>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            padding: '1em 1.5em',
+            flexWrap: 'wrap'
+          }}
+        >
+          {/* Device Icon */}
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {deviceInfo.HardwareVersion === 1 && (
+              <img
+                width={60}
+                src='./v1-icon.png'
+                alt="Hardware Version 1"
+                style={{ display: 'block' }}
+              />
+            )}
+            {deviceInfo.HardwareVersion === 2 && (
+              <img
+                width={60}
+                src='./v2-icon.png'
+                alt="Hardware Version 2"
+                style={{ display: 'block' }}
+              />
+            )}
+          </Box>
 
-            {/* Device Name */}
-            <Box>
-              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Device Name
-              </Typography>
-              <Typography variant="h6" sx={{ marginTop: '0.25em' }}>
-                {deviceInfo.DeviceName}
-              </Typography>
-            </Box>
+          <Divider orientation="vertical" flexItem />
 
-            {/* Device ID */}
-            <Box>
-              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600 }}>
-                Device ID
-              </Typography>
-              <Typography variant="body1" sx={{ marginTop: '0.25em', fontFamily: 'monospace' }}>
-                {deviceInfo.DeviceID}
-              </Typography>
-            </Box>
+          {/* Device Name */}
+          <Box sx={{ minWidth: '150px' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 600 }}>
+              Device Name
+            </Typography>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              {deviceInfo.DeviceName}
+            </Typography>
+          </Box>
 
-            <Divider />
+          <Divider orientation="vertical" flexItem />
 
-            {/* Version Information */}
-            <Box>
-              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600, marginBottom: '0.5em', display: 'block' }}>
-                Version Information
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ marginTop: '0.5em' }}>
-                <Chip 
-                  label={`Firmware: ${deviceInfo.FirmwareVersion}`} 
-                  color="primary" 
-                  variant="outlined"
-                />
-                <Chip 
-                  label={`Hardware: v${deviceInfo.HardwareVersion}`} 
-                  color="secondary" 
-                  variant="outlined"
-                />
-              </Stack>
-            </Box>
-          </Stack>
-        </CardContent>
-      </Card>
+          {/* Device ID */}
+          <Box sx={{ minWidth: '80px' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 600 }}>
+              Device ID
+            </Typography>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+              {deviceInfo.DeviceID}
+            </Typography>
+          </Box>
+
+          <Divider orientation="vertical" flexItem />
+
+          {/* Version Information */}
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 600, marginBottom: '0.3em', display: 'block' }}>
+              Version Information
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Chip
+                label={`Firmware: ${deviceInfo.FirmwareVersion}`}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+              <Chip
+                label={`Hardware: v${deviceInfo.HardwareVersion}`}
+                size="small"
+                color="secondary"
+                variant="outlined"
+              />
+            </Stack>
+          </Box>
+        </Stack>
+      </Paper>
     </Box>
   )
 }
