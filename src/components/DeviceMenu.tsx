@@ -20,13 +20,15 @@ function DeviceInfoToolbar({ deviceInfo }: { deviceInfo: DeviceInformation }) {
       <Paper elevation={2}>
         <Stack
           direction="row"
-          spacing={2}
+          spacing={{ xs: 1, sm: 2 }}
           alignItems="center"
           justifyContent="center"
           sx={{
             padding: '1em 1.5em',
             flexWrap: 'wrap'
           }}
+          useFlexGap
+          divider={<Divider orientation="vertical" flexItem />}
         >
           {/* Device Icon */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -48,19 +50,15 @@ function DeviceInfoToolbar({ deviceInfo }: { deviceInfo: DeviceInformation }) {
             )}
           </Box>
 
-          <Divider orientation="vertical" flexItem />
-
           {/* Device Name */}
           <Box sx={{ minWidth: '150px' }}>
             <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '0.7rem', fontWeight: 600 }}>
               Device Name
             </Typography>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
               {deviceInfo.DeviceName}
             </Typography>
           </Box>
-
-          <Divider orientation="vertical" flexItem />
 
           {/* Device ID */}
           <Box sx={{ minWidth: '80px' }}>
@@ -71,8 +69,6 @@ function DeviceInfoToolbar({ deviceInfo }: { deviceInfo: DeviceInformation }) {
               {deviceInfo.DeviceID}
             </Typography>
           </Box>
-
-          <Divider orientation="vertical" flexItem />
 
           {/* Version Information */}
           <Box>
