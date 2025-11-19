@@ -3,7 +3,7 @@ import Bluetooth from '@mui/icons-material/Bluetooth';
 import NetworkWifi from '@mui/icons-material/NetworkWifi';
 import React from 'react';
 
-import HttpRPC from './beacon-rpc/HttpRPC.tsx';
+import HttpRPC from '../beacon-rpc/HttpRPC.tsx';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
@@ -16,7 +16,7 @@ import StepContent from '@mui/material/StepContent';
 import StepLabel from '@mui/material/StepLabel';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import type BeaconState from './BeaconState.tsx';
+import type BeaconState from '../BeaconState.tsx';
 
 
 export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<React.SetStateAction<BeaconState>> }) {
