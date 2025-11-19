@@ -39,6 +39,7 @@ function MessageItem({ idx, message }: { idx: number; message: string }) {
 
     return (
         <ListItem
+            key={idx}
             secondaryAction={
                 editMode ? 
                     null :
