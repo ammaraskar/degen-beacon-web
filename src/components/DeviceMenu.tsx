@@ -13,8 +13,10 @@ import Tab from "@mui/material/Tab";
 import Message from "@mui/icons-material/Message";
 import PinDrop from "@mui/icons-material/PinDrop";
 import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt";
+import type RpcInterface from "../beacon-rpc/RpcInterface";
+import { SavedMessages } from "./SavedMessages";
 
-export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
+export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo: DeviceInformation }) {
   const [tabValue, setTabValue] = React.useState(0);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -22,7 +24,7 @@ export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
   };
 
   const tabs = [
-    { icon: <Message />, label: "Messages", component: <>messages</> },
+    { icon: <Message />, label: "Messages", component: <SavedMessages rpc={rpc} /> },
     { icon: <PinDrop />, label: "Locations", component: <>locations</> },
     { icon: <Settings />, label: "Settings", component: <>settings</> },
     { icon: <SystemUpdateAlt />, label: "Firmware", component: <>firmware</> },

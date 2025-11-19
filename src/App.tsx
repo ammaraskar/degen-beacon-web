@@ -14,7 +14,7 @@ function App() {
     <>
       <CssBaseline />
       {!beacon.connected && <ConnectCard setBeacon={setBeacon} />}
-      {beacon.connected && <DeviceMenu deviceInfo={beacon.initialDeviceInformation!} />}
+      {beacon.connected && <DeviceMenu rpc={beacon.rpc!} deviceInfo={beacon.initialDeviceInformation!} />}
       <PWABadge />
     </>
   )
