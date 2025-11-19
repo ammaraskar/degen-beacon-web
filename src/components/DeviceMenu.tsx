@@ -13,10 +13,10 @@ export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
         Firmware: {deviceInfo.FirmwareVersion}, Hardware: {deviceInfo.HardwareVersion}
 
         {deviceInfo.HardwareVersion === 1 && (
-            <img src='./v1-icon.png'></img>
+            <img width={150} src='./v1-icon.png'></img>
         )}
         {deviceInfo.HardwareVersion === 2 && (
-            <img src='./v2-icon.png'></img>
+            <img width={150} src='./v2-icon.png'></img>
         )}
       </Typography>
     </Box>
