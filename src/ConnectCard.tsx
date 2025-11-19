@@ -17,6 +17,7 @@ import StepLabel from '@mui/material/StepLabel';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import type BeaconState from './BeaconState.tsx';
+import Container from '@mui/material/Container';
 
 
 export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<React.SetStateAction<BeaconState>> }) {
@@ -48,54 +49,56 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
   const [connectButtonLoading, setConnectButtonLoading] = React.useState(false);
 
   return (
-    <Card sx={{ padding: '1em', minWidth: '300px', maxWidth: '600px' }}>
-      <CardHeader title={
-        <Typography color="text.secondary" component="h1" variant="h4">
-          Connect Beacon
-        </Typography>
-      } />
-      <CardContent>
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Card sx={{ padding: '1em', minWidth: '300px', maxWidth: '600px', textAlign: 'center' }}>
+        <CardHeader title={
+          <Typography color="text.secondary" component="h1" variant="h4">
+            Connect Beacon
+          </Typography>
+        } />
+        <CardContent>
 
-        <Box textAlign='left' sx={{ maxWidth: 400 }}>
-          <Stepper activeStep={activeStep} orientation="vertical">
-            <Step key="Connection Method">
-              <StepLabel>Connection Method</StepLabel>
-              <StepContent>
-                <Typography>Choose which way you would like to connect to your beacon.</Typography>
+          <Box textAlign='left' sx={{ maxWidth: 400 }}>
+            <Stepper activeStep={activeStep} orientation="vertical">
+              <Step key="Connection Method">
+                <StepLabel>Connection Method</StepLabel>
+                <StepContent>
+                  <Typography>Choose which way you would like to connect to your beacon.</Typography>
 
-                <Box sx={{ mb: 2 }}>
-                  <Button onClick={handleNext} sx={{ mt: 1, mr: 1 }} startIcon={<NetworkWifi />} variant='contained'>WiFi</Button>
-                  <Tooltip arrow title="Bluetooth connection is currently in development.">
-                    <span>
-                      <Button sx={{ mt: 1, mr: 1 }} startIcon={<Bluetooth />} disabled variant='contained'>Bluetooth</Button>
-                    </span>
-                  </Tooltip>
-                </Box>
-              </StepContent>
-            </Step>
-            <Step key="Connect">
-              <StepLabel>Connect with WiFi</StepLabel>
-              <StepContent>
-                <Typography>
-                  Select <b>Pair with Terminal</b> on your beacon to see its IP Address.
-                </Typography>
-                <Typography variant='body2'>
-                  Make sure it's on the same Network as this device.
-                </Typography>
-
-                <FormGroup sx={{ mt: 4 }}>
-                  <TextField value={ipAddress} onChange={handleIpAddressChange} sx={{ mt: 1, mb: 1 }} label="Beacon IP Address" variant="outlined" />
                   <Box sx={{ mb: 2 }}>
-                    <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
-                    <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
+                    <Button onClick={handleNext} sx={{ mt: 1, mr: 1 }} startIcon={<NetworkWifi />} variant='contained'>WiFi</Button>
+                    <Tooltip arrow title="Bluetooth connection is currently in development.">
+                      <span>
+                        <Button sx={{ mt: 1, mr: 1 }} startIcon={<Bluetooth />} disabled variant='contained'>Bluetooth</Button>
+                      </span>
+                    </Tooltip>
                   </Box>
-                </FormGroup>
-              </StepContent>
-            </Step>
-          </Stepper>
-        </Box>
+                </StepContent>
+              </Step>
+              <Step key="Connect">
+                <StepLabel>Connect with WiFi</StepLabel>
+                <StepContent>
+                  <Typography>
+                    Select <b>Pair with Terminal</b> on your beacon to see its IP Address.
+                  </Typography>
+                  <Typography variant='body2'>
+                    Make sure it's on the same Network as this device.
+                  </Typography>
 
-      </CardContent>
-    </Card>
+                  <FormGroup sx={{ mt: 4 }}>
+                    <TextField value={ipAddress} onChange={handleIpAddressChange} sx={{ mt: 1, mb: 1 }} label="Beacon IP Address" variant="outlined" />
+                    <Box sx={{ mb: 2 }}>
+                      <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
+                      <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
+                    </Box>
+                  </FormGroup>
+                </StepContent>
+              </Step>
+            </Stepper>
+          </Box>
+
+        </CardContent>
+      </Card>
+    </Box>
   )
 }
