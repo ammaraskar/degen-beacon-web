@@ -5,11 +5,34 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
+import React from "react";
+import Settings from "@mui/icons-material/Settings";
+import Container from "@mui/material/Container";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Message from "@mui/icons-material/Message";
+import PinDrop from "@mui/icons-material/PinDrop";
+import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt";
 
 export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
+  const [tabValue, setTabValue] = React.useState(0);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   return (
     <>
       <DeviceInfoToolbar deviceInfo={deviceInfo} />
+
+      <Container sx={{ maxWidth: '600px', mt: 2}}>
+        <Tabs value={tabValue} onChange={handleTabChange} centered>
+          <Tab icon={<Message />} label="Messages" />
+          <Tab icon={<PinDrop />} label="Locations" />
+          <Tab icon={<Settings />} label="Settings" />
+          <Tab icon={<SystemUpdateAlt />} label="Firmware" />
+        </Tabs>
+      </Container>
     </>
   )
 }
@@ -17,7 +40,7 @@ export function DeviceMenu({ deviceInfo }: { deviceInfo: DeviceInformation }) {
 function DeviceInfoToolbar({ deviceInfo }: { deviceInfo: DeviceInformation }) {
   return (
     <Box textAlign='center'>
-      <Paper elevation={2}>
+      <Paper elevation={3}>
         <Stack
           direction="row"
           spacing={{ xs: 1, sm: 2 }}
