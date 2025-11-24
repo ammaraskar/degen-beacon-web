@@ -1,5 +1,5 @@
 import { decode, encode } from "@msgpack/msgpack";
-import type { DeviceInformation, SavedMessagesResponse } from "./RpcInterface";
+import type { DeviceInformation, GetSettingsResponse, SavedLocationsResponse, SavedMessagesResponse } from "./RpcInterface";
 import type RpcInterface from "./RpcInterface";
 
 class HttpRPC implements RpcInterface {
@@ -15,16 +15,28 @@ class HttpRPC implements RpcInterface {
     }
 
     async getSavedMessages(): Promise<SavedMessagesResponse> {
-        const body = {
-            'F': 'GetSavedMessages',
-        };
+        return (await this._sendMsgPackRpc('GetSavedMessages')) as SavedMessagesResponse;
+    }
 
+    async getSavedLocations(): Promise<SavedLocationsResponse> {
+        return (await this._sendMsgPackRpc('GetSavedLocations')) as SavedLocationsResponse;
+    }
+
+    async getSettings(): Promise<GetSettingsResponse> {
+        return (await this._sendMsgPackRpc('GetSettings')) as GetSettingsResponse;
+    }
+
+    async _sendMsgPackRpc(functionName: string, params: any = {}): Promise<any> {
+        const body = {
+            'F': functionName,
+            ...params,
+        };
         const response = await fetch(`http://${this.ipAddress}/rpc`, {
             method: 'POST',
             body: encodeMsgPack(body),
         });
         const responseData = await response.arrayBuffer();
-        return decode(responseData) as SavedMessagesResponse;
+        return decode(responseData);
     }
 }
 
