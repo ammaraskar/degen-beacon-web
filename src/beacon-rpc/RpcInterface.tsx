@@ -11,14 +11,14 @@ export type SavedMessagesResponse = {
     Messages: string[];
 }
 
-export type Location = {
+export type SavedLocation = {
     Name: string;
     Lat: number;
-    Lon: number;
+    Lng: number;
 }
 
 export type SavedLocationsResponse = {
-    Locations: Location[];
+    Locations: SavedLocation[];
 }
 
 export type GetSettingsResponse = {
