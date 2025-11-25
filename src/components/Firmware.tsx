@@ -13,10 +13,19 @@ import Alert from "@mui/material/Alert";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import MemoryIcon from "@mui/icons-material/Memory";
 
+// Static firmware list - will be fetched from server later
+const AVAILABLE_FIRMWARE = [
+    { version: '3.0.3.0', date: '2025-11-24', description: 'Latest stable release with bug fixes', hwVersion: 1 },
+    { version: '3.0.2.96', date: '2025-11-20', description: 'Current version', hwVersion: 1 },
+    { version: '3.0.2.95', date: '2025-11-15', description: 'Previous stable release', hwVersion: 1 },
+    { version: '2.5.1.0', date: '2025-10-30', description: 'Legacy version for v2 hardware', hwVersion: 2 },
+];
+
 export function Firmware({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo: DeviceInformation }) {
     rpc; // TODO: use rpc here to actually upload firmware
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [selectedFirmware, setSelectedFirmware] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null);
@@ -79,11 +88,76 @@ export function Firmware({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo: D
                 </CardContent>
             </Card>
 
+            {/* Available Firmware */}
+            <Card elevation={2} sx={{ marginBottom: '2em' }}>
+                <CardContent>
+                    <Typography variant="h6" sx={{ marginBottom: '1em' }}>
+                        Available Firmware
+                    </Typography>
+                    
+                    <Stack spacing={1}>
+                        {AVAILABLE_FIRMWARE.filter(fw => fw.hwVersion === deviceInfo.HardwareVersion).map((firmware) => (
+                            <Card 
+                                key={firmware.version}
+                                variant="outlined"
+                                sx={{ 
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    border: selectedFirmware === firmware.version ? '2px solid' : '1px solid',
+                                    borderColor: selectedFirmware === firmware.version ? 'primary.main' : 'divider',
+                                    backgroundColor: selectedFirmware === firmware.version ? 'action.selected' : 'transparent',
+                                    '&:hover': {
+                                        backgroundColor: 'action.hover',
+                                        borderColor: 'primary.light'
+                                    }
+                                }}
+                                onClick={() => setSelectedFirmware(firmware.version)}
+                            >
+                                <CardContent sx={{ padding: '1em !important' }}>
+                                    <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                                        <Box>
+                                            <Typography variant="h6" sx={{ fontFamily: 'monospace', marginBottom: '0.25em' }}>
+                                                {firmware.version}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {firmware.description}
+                                            </Typography>
+                                        </Box>
+                                        <Stack direction="row" spacing={1} alignItems="center">
+                                            <Chip label={firmware.date} size="small" variant="outlined" />
+                                            {firmware.version === deviceInfo.FirmwareVersion && (
+                                                <Chip label="Current" size="small" color="success" />
+                                            )}
+                                        </Stack>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Stack>
+
+                    {selectedFirmware && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {
+                                // TODO: Download and install selected firmware
+                                setMessage({ type: 'info', text: `Installing firmware ${selectedFirmware}...` });
+                            }}
+                            disabled={uploading || selectedFirmware === deviceInfo.FirmwareVersion}
+                            fullWidth
+                            sx={{ marginTop: '1em' }}
+                        >
+                            Install Selected Firmware
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
+
             {/* Upload Form */}
             <Card elevation={2}>
                 <CardContent>
                     <Typography variant="h6" sx={{ marginBottom: '1em' }}>
-                        Upload New Firmware
+                        Upload Custom Firmware
                     </Typography>
 
                     {message && (
