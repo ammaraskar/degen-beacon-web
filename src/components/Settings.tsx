@@ -17,6 +17,18 @@ import FormControl from "@mui/material/FormControl";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import PersonIcon from "@mui/icons-material/Person";
+import BadgeIcon from "@mui/icons-material/Badge";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import DevicesIcon from "@mui/icons-material/Devices";
+import PaletteIcon from "@mui/icons-material/Palette";
+import RadioIcon from "@mui/icons-material/Radio";
+import SettingsInputAntennaIcon from "@mui/icons-material/SettingsInputAntenna";
+import RepeatIcon from "@mui/icons-material/Repeat";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import MemoryIcon from "@mui/icons-material/Memory";
+import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
+import WifiIcon from "@mui/icons-material/Wifi";
 import { ConfigTypes } from "../beacon-rpc/ConfigValue";
 import type { ConfigurableEnumConfigValue, ConfigurableIntegerConfigValue, ConfigurableFloatConfigValue } from "../beacon-rpc/ConfigValue";
 import NumberSpinner from "./ext/NumberSpinner";
@@ -139,10 +151,17 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
         '&:hover': { backgroundColor: 'action.selected' }
     };
 
+    const settingIcon = SETTING_ICONS[name];
+
     return (
         <Card elevation={1} sx={{ backgroundColor: 'background.paper' }}>
             <CardContent sx={{ padding: '1em !important' }}>
                 <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                    {settingIcon && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                            {settingIcon}
+                        </Box>
+                    )}
                     <Box sx={{ flex: 1 }}>
                         <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
                             {name}
@@ -178,3 +197,21 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
         </Card>
     );
 }
+
+const SETTING_ICONS: Record<string, JSX.Element> = {
+    "UserID": <PersonIcon fontSize="small" />,
+    "User Name": <BadgeIcon fontSize="small" />,
+    "Silent Mode": <VolumeOffIcon fontSize="small" />,
+    "Device Name": <DevicesIcon fontSize="small" />,
+    "Color Theme": <PaletteIcon fontSize="small" />,
+    "Theme Red": <PaletteIcon fontSize="small" color="error" />,
+    "Theme Green": <PaletteIcon fontSize="small" color="success" />,
+    "Theme Blue": <PaletteIcon fontSize="small" color="info" />,
+    "Frequency": <RadioIcon fontSize="small" />,
+    "Modem Config": <SettingsInputAntennaIcon fontSize="small" />,
+    "Broadcast Attempts": <RepeatIcon fontSize="small" />,
+    "24H Time": <AccessTimeIcon fontSize="small" />,
+    "Firmware Version": <MemoryIcon fontSize="small" />,
+    "Hardware Version": <DeveloperBoardIcon fontSize="small" />,
+    "WiFi Provisioning": <WifiIcon fontSize="small" />,
+};
