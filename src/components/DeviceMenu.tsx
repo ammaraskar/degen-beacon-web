@@ -17,6 +17,7 @@ import type RpcInterface from "../beacon-rpc/RpcInterface";
 import { SavedMessages } from "./SavedMessages";
 import { SavedLocations } from "./SavedLocations";
 import { Settings as SettingsComponent } from "./Settings";
+import { Firmware } from "./Firmware";
 
 export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo: DeviceInformation }) {
   const [tabValue, setTabValue] = React.useState(0);
@@ -29,7 +30,7 @@ export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo:
     { icon: <Message />, label: "Messages", component: <SavedMessages rpc={rpc} /> },
     { icon: <PinDrop />, label: "Locations", component: <SavedLocations rpc={rpc} /> },
     { icon: <Settings />, label: "Settings", component: <SettingsComponent rpc={rpc} /> },
-    { icon: <SystemUpdateAlt />, label: "Firmware", component: <>firmware</> },
+    { icon: <SystemUpdateAlt />, label: "Firmware", component: <Firmware deviceInfo={deviceInfo} rpc={rpc} /> },
   ];
 
   return (
