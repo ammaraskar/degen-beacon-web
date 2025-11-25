@@ -4,6 +4,12 @@ import type { GetSettingsResponse, Setting } from "../beacon-rpc/RpcInterface";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
 import { ConfigTypes } from "../beacon-rpc/ConfigValue";
 
 export function Settings({ rpc }: { rpc: RpcInterface }) {
@@ -37,41 +43,59 @@ export function Settings({ rpc }: { rpc: RpcInterface }) {
 }
 
 export function SettingItem({ name, setting }: { name: string, setting: Setting }): JSX.Element {
-    if (typeof setting == 'string' || typeof setting == 'number' || typeof setting == 'boolean') {
-        return (
-            <Typography variant="body1">
-                {name}: {setting}
-            </Typography>
-        );
+    let displayValue: string;
+    let isConfigurable = false;
+
+    if (typeof setting === 'string' || typeof setting === 'number' || typeof setting === 'boolean') {
+        displayValue = String(setting);
+    } else {
+        // ConfigValue
+        displayValue = String(setting.cfgVal);
+        isConfigurable = setting.cfgType >= ConfigTypes.CONFIGURABLE_BOOLEAN;
     }
-    // ConfigValue
-    switch (setting.cfgType) {
-        case ConfigTypes.NULL:
-        case ConfigTypes.BOOLEAN:
-        case ConfigTypes.INTEGER:
-        case ConfigTypes.FLOAT:
-        case ConfigTypes.STRING:
-        case ConfigTypes.ARRAY:
-        case ConfigTypes.OBJECT:
-            return (
-                <Typography variant="body1">
-                    {name}: {String(setting.cfgVal)}
-                </Typography>
-            );
-        case ConfigTypes.CONFIGURABLE_BOOLEAN:
-        case ConfigTypes.CONFIGURABLE_INTEGER:
-        case ConfigTypes.CONFIGURABLE_FLOAT:
-        case ConfigTypes.CONFIGURABLE_STRING:
-            return (
-                <Typography variant="body1">
-                    {name}: {String(setting.cfgVal)}
-                </Typography>
-            );
-        case ConfigTypes.CONFIGURABLE_ENUM:
-            return (
-                <Typography variant="body1">
-                    {name}: {String(setting.cfgVal)} (enum)
-                </Typography>
-            );
-    }
+
+    return (
+        <Card elevation={1} sx={{ backgroundColor: 'background.paper' }}>
+            <CardContent sx={{ padding: '1em !important' }}>
+                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                    <Box sx={{ flex: 1 }}>
+                        <Typography 
+                            variant="caption" 
+                            color="text.secondary" 
+                            sx={{ 
+                                textTransform: 'uppercase', 
+                            }}
+                        >
+                            {name}
+                        </Typography>
+                        <Typography 
+                            variant="body1" 
+                            sx={{
+                                fontFamily: 'monospace',
+                            }}
+                        >
+                            {displayValue}
+                        </Typography>
+                    </Box>
+                    {isConfigurable && (
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <IconButton
+                                size="small"
+                                color="primary"
+                                aria-label="edit setting"
+                                sx={{
+                                    backgroundColor: 'action.hover',
+                                    '&:hover': {
+                                        backgroundColor: 'action.selected'
+                                    }
+                                }}
+                            >
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+                        </Stack>
+                    )}
+                </Stack>
+            </CardContent>
+        </Card>
+    );
 }
