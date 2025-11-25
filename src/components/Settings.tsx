@@ -7,7 +7,6 @@ import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Switch from "@mui/material/Switch";
@@ -41,7 +40,7 @@ export function Settings({ rpc }: { rpc: RpcInterface }) {
                 Settings
             </Typography>
 
-            <Stack direction="column" spacing={2}>
+            <Stack direction="column" spacing={1}>
                 {
                     [...Object.entries(settings)].map(([key, value]) =>
                         <SettingItem key={key} name={key} setting={value} />
@@ -135,31 +134,23 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
         }
     };
 
+    const iconButtonSx = {
+        backgroundColor: 'action.hover',
+        '&:hover': { backgroundColor: 'action.selected' }
+    };
+
     return (
         <Card elevation={1} sx={{ backgroundColor: 'background.paper' }}>
             <CardContent sx={{ padding: '1em !important' }}>
                 <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
                     <Box sx={{ flex: 1 }}>
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                                textTransform: 'uppercase',
-                            }}
-                        >
+                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase' }}>
                             {name}
                         </Typography>
                         {isEditing ? (
-                            <Box sx={{ marginTop: '0.5em' }}>
-                                {renderEditor()}
-                            </Box>
+                            <Box sx={{ marginTop: '0.5em' }}>{renderEditor()}</Box>
                         ) : (
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontFamily: 'monospace',
-                                }}
-                            >
+                            <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
                                 {displayValue}
                             </Typography>
                         )}
@@ -168,48 +159,15 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                         <Stack direction="row" spacing={1} alignItems="center">
                             {isEditing ? (
                                 <>
-                                    <IconButton
-                                        size="small"
-                                        color="success"
-                                        aria-label="save setting"
-                                        onClick={handleSave}
-                                        sx={{
-                                            backgroundColor: 'action.hover',
-                                            '&:hover': {
-                                                backgroundColor: 'action.selected'
-                                            }
-                                        }}
-                                    >
+                                    <IconButton size="small" color="success" onClick={handleSave} sx={iconButtonSx}>
                                         <CheckIcon fontSize="small" />
                                     </IconButton>
-                                    <IconButton
-                                        size="small"
-                                        color="error"
-                                        aria-label="cancel editing"
-                                        onClick={handleCancel}
-                                        sx={{
-                                            backgroundColor: 'action.hover',
-                                            '&:hover': {
-                                                backgroundColor: 'action.selected'
-                                            }
-                                        }}
-                                    >
+                                    <IconButton size="small" color="error" onClick={handleCancel} sx={iconButtonSx}>
                                         <CloseIcon fontSize="small" />
                                     </IconButton>
                                 </>
                             ) : (
-                                <IconButton
-                                    size="small"
-                                    color="primary"
-                                    aria-label="edit setting"
-                                    onClick={handleEdit}
-                                    sx={{
-                                        backgroundColor: 'action.hover',
-                                        '&:hover': {
-                                            backgroundColor: 'action.selected'
-                                        }
-                                    }}
-                                >
+                                <IconButton size="small" color="primary" onClick={handleEdit} sx={iconButtonSx}>
                                     <EditIcon fontSize="small" />
                                 </IconButton>
                             )}
