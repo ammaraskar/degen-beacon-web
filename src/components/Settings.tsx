@@ -19,7 +19,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { ConfigTypes } from "../beacon-rpc/ConfigValue";
-import type { ConfigurableEnumConfigValue } from "../beacon-rpc/ConfigValue";
+import type { ConfigurableEnumConfigValue, ConfigurableIntegerConfigValue, ConfigurableFloatConfigValue } from "../beacon-rpc/ConfigValue";
+import NumberSpinner from "./ext/NumberSpinner";
 
 export function Settings({ rpc }: { rpc: RpcInterface }) {
     const [settings, setSettings] = React.useState<GetSettingsResponse | null>(null);
@@ -54,7 +55,7 @@ export function Settings({ rpc }: { rpc: RpcInterface }) {
 export function SettingItem({ name, setting }: { name: string, setting: Setting }): JSX.Element {
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState<string | number | boolean>('');
-    
+
     let displayValue: string;
     let isConfigurable = false;
     let configType: number | null = null;
@@ -66,7 +67,7 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
         displayValue = String(setting.cfgVal);
         isConfigurable = setting.cfgType >= ConfigTypes.CONFIGURABLE_BOOLEAN;
         configType = setting.cfgType;
-        
+
         // For enums, show the friendly label instead of the numeric value
         if (setting.cfgType === ConfigTypes.CONFIGURABLE_ENUM) {
             const enumSetting = setting as ConfigurableEnumConfigValue;
@@ -96,9 +97,9 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
     };
 
     const renderEditInput = () => {
-        if (!configType) return null;
+        if (!(setting instanceof Object) || !('cfgType' in setting)) return null;
 
-        switch (configType) {
+        switch (setting.cfgType) {
             case ConfigTypes.CONFIGURABLE_BOOLEAN:
                 return (
                     <FormControlLabel
@@ -112,22 +113,31 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                         label={String(editValue)}
                     />
                 );
-            
+
             case ConfigTypes.CONFIGURABLE_INTEGER:
                 return (
-                    <TextField type="number" value={editValue} size="small" fullWidth
-                        onChange={(e) => setEditValue(parseInt(e.target.value) || 0)}
+                    <NumberSpinner
+                        value={editValue as number}
+                        onValueChange={(value) => setEditValue(value ?? 0)}
+                        min={setting.minVal}
+                        max={setting.maxVal}
+                        step={setting.incVal}
+                        size="small"
                     />
                 );
-            
+
             case ConfigTypes.CONFIGURABLE_FLOAT:
                 return (
-                    <TextField
-                        type="number" value={editValue} size="small" fullWidth
-                        onChange={(e) => setEditValue(parseFloat(e.target.value) || 0)}
+                    <NumberSpinner
+                        value={editValue as number}
+                        onValueChange={(value) => setEditValue(value ?? 0)}
+                        min={setting.minVal}
+                        max={setting.maxVal}
+                        step={setting.incVal}
+                        size="small"
                     />
                 );
-            
+
             case ConfigTypes.CONFIGURABLE_STRING:
                 return (
                     <TextField
@@ -138,7 +148,7 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                         fullWidth
                     />
                 );
-            
+
             case ConfigTypes.CONFIGURABLE_ENUM:
                 if (typeof setting === 'object' && 'vals' in setting && 'valTxt' in setting) {
                     const enumSetting = setting as ConfigurableEnumConfigValue;
@@ -158,7 +168,7 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                     );
                 }
                 return null;
-            
+
             default:
                 return null;
         }
@@ -169,11 +179,11 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
             <CardContent sx={{ padding: '1em !important' }}>
                 <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
                     <Box sx={{ flex: 1 }}>
-                        <Typography 
-                            variant="caption" 
-                            color="text.secondary" 
-                            sx={{ 
-                                textTransform: 'uppercase', 
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                                textTransform: 'uppercase',
                             }}
                         >
                             {name}
@@ -183,8 +193,8 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                                 {renderEditInput()}
                             </Box>
                         ) : (
-                            <Typography 
-                                variant="body1" 
+                            <Typography
+                                variant="body1"
                                 sx={{
                                     fontFamily: 'monospace',
                                 }}
