@@ -10,7 +10,6 @@ import IconButton from "@mui/material/IconButton";
 import Chip from "@mui/material/Chip";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export function SavedLocations({ rpc }: { rpc: RpcInterface }) {
     const [locations, setLocations] = React.useState<SavedLocation[]>([]);

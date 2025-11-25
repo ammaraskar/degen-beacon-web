@@ -16,6 +16,7 @@ import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt";
 import type RpcInterface from "../beacon-rpc/RpcInterface";
 import { SavedMessages } from "./SavedMessages";
 import { SavedLocations } from "./SavedLocations";
+import { Settings as SettingsComponent } from "./Settings";
 
 export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo: DeviceInformation }) {
   const [tabValue, setTabValue] = React.useState(0);
@@ -27,7 +28,7 @@ export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo:
   const tabs = [
     { icon: <Message />, label: "Messages", component: <SavedMessages rpc={rpc} /> },
     { icon: <PinDrop />, label: "Locations", component: <SavedLocations rpc={rpc} /> },
-    { icon: <Settings />, label: "Settings", component: <>settings</> },
+    { icon: <Settings />, label: "Settings", component: <SettingsComponent rpc={rpc} /> },
     { icon: <SystemUpdateAlt />, label: "Firmware", component: <>firmware</> },
   ];
 

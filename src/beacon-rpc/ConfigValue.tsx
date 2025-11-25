@@ -1,45 +1,61 @@
-type NullConfigValue = {
-    cfgType: 0
+export const ConfigTypes = {
+    NULL: 0,
+    BOOLEAN: 1,
+    INTEGER: 2,
+    FLOAT: 3,
+    STRING: 4,
+    ARRAY: 5,
+    OBJECT: 6,
+    CONFIGURABLE_BOOLEAN: 7,
+    CONFIGURABLE_INTEGER: 8,
+    CONFIGURABLE_FLOAT: 9,
+    CONFIGURABLE_STRING: 10,
+    CONFIGURABLE_ENUM: 11,
+} as const;
+export type ConfigType = typeof ConfigTypes[keyof typeof ConfigTypes];
+
+export type NullConfigValue = {
+    cfgType: typeof ConfigTypes.NULL,
     cfgVal: null,
 };
 
-type BooleanConfigValue = {
-    cfgType: 1,
+export type BooleanConfigValue = {
+    cfgType: typeof ConfigTypes.BOOLEAN,
     cfgVal: boolean,
 };
 
-type IntegerConfigValue = {
-    cfgType: 2,
+export type IntegerConfigValue = {
+    cfgType: typeof ConfigTypes.INTEGER,
     cfgVal: number,
 };
 
-type FloatConfigValue = {
-    cfgType: 3,
+export type FloatConfigValue = {
+    cfgType: typeof ConfigTypes.FLOAT,
     cfgVal: number,
 };
 
-type StringConfigValue = {
-    cfgType: 4,
+export type StringConfigValue = {
+    cfgType: typeof ConfigTypes.STRING,
     cfgVal: string,
 };
 
-type ArrayConfigValue = {
-    cfgType: 5,
+export type ArrayConfigValue = {
+    cfgType: typeof ConfigTypes.ARRAY,
     cfgVal: unknown[],
 };
 
-type ObjectConfigValue = {
-    cfgType: 6,
+export type ObjectConfigValue = {
+    cfgType: typeof ConfigTypes.OBJECT,
     cfgVal: { [key: string]: unknown },
 };
 
-type ConfigurableBooleanConfigValue = {
-    cfgType: 7,
+export type ConfigurableBooleanConfigValue = {
+    cfgType: typeof ConfigTypes.CONFIGURABLE_BOOLEAN,
     cfgVal: boolean,
 };
 
-type ConfigurableIntegerConfigValue = {
-    cfgType: 8,
+export type ConfigurableIntegerConfigValue = {
+    cfgType: typeof ConfigTypes.CONFIGURABLE_INTEGER,
     cfgVal: number,
 
     minVal: number,
@@ -48,8 +64,8 @@ type ConfigurableIntegerConfigValue = {
     signed: boolean,
 };
 
-type ConfigurableFloatConfigValue = {
-    cfgType: 9,
+export type ConfigurableFloatConfigValue = {
+    cfgType: typeof ConfigTypes.CONFIGURABLE_FLOAT,
     cfgVal: number,
 
     minVal: number,
@@ -57,15 +73,15 @@ type ConfigurableFloatConfigValue = {
     incVal: number,
 };
 
-type ConfigurableStringConfigValue = {
-    cfgType: 10,
+export type ConfigurableStringConfigValue = {
+    cfgType: typeof ConfigTypes.CONFIGURABLE_STRING,
     cfgVal: string,
 
     maxLen: number,
 };
 
-type ConfigurableEnumConfigValue = {
-    cfgType: 11,
+export type ConfigurableEnumConfigValue = {
+    cfgType: typeof ConfigTypes.CONFIGURABLE_ENUM,
     cfgVal: number,
 
     vals: number[],

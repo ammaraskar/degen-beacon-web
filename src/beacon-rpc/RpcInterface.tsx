@@ -21,9 +21,8 @@ export type SavedLocationsResponse = {
     Locations: SavedLocation[];
 }
 
-export type GetSettingsResponse = {
-    [key: string]: number | string | boolean | ConfigValue;
-}
+export type Setting = number | string | boolean | ConfigValue;
+export type GetSettingsResponse = Record<string, Setting>;
 
 
 export default interface RpcInterface {

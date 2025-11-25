@@ -35,7 +35,7 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
 
     const rpc = new HttpRPC(ipAddress);
     rpc.getDeviceInformation().then((info) => {
-      console.log('Connected to device:', info);
+      console.log('Connected to device:', info, rpc);
       setBeacon({ connected: true, rpc, initialDeviceInformation: info });
     });
   };
