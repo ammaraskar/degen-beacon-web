@@ -56,28 +56,24 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState<string | number | boolean>('');
 
-    let displayValue: string;
-    let isConfigurable = false;
-    let configType: number | null = null;
-
-    if (typeof setting === 'string' || typeof setting === 'number' || typeof setting === 'boolean') {
-        displayValue = String(setting);
-    } else {
-        // ConfigValue
-        displayValue = String(setting.cfgVal);
-        isConfigurable = setting.cfgType >= ConfigTypes.CONFIGURABLE_BOOLEAN;
-        configType = setting.cfgType;
-
-        // For enums, show the friendly label instead of the numeric value
+    const isPrimitive = typeof setting === 'string' || typeof setting === 'number' || typeof setting === 'boolean';
+    const isConfigurable = !isPrimitive && setting.cfgType >= ConfigTypes.CONFIGURABLE_BOOLEAN;
+    
+    const displayValue = (() => {
+        if (isPrimitive) return String(setting);
+        
+        // For enums, show the friendly label
         if (setting.cfgType === ConfigTypes.CONFIGURABLE_ENUM) {
             const enumSetting = setting as ConfigurableEnumConfigValue;
             const valueIndex = enumSetting.vals.indexOf(enumSetting.cfgVal as number);
-            displayValue = enumSetting.valTxt[valueIndex];
+            return enumSetting.valTxt[valueIndex];
         }
-    }
+        
+        return String(setting.cfgVal);
+    })();
 
     const handleEdit = () => {
-        if (typeof setting === 'object' && 'cfgVal' in setting) {
+        if (!isPrimitive) {
             const val = setting.cfgVal;
             if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
                 setEditValue(val);
@@ -87,87 +83,52 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
     };
 
     const handleSave = () => {
-        // TODO: Call RPC to save the value
-        console.log('Saving', name, editValue);
+        console.log('Saving', name, editValue); // TODO: Call RPC
         setIsEditing(false);
     };
 
-    const handleCancel = () => {
-        setIsEditing(false);
-    };
+    const handleCancel = () => setIsEditing(false);
 
-    const renderEditInput = () => {
-        if (!(setting instanceof Object) || !('cfgType' in setting)) return null;
+    const renderEditor = () => {
+        if (isPrimitive) return null;
 
         switch (setting.cfgType) {
             case ConfigTypes.CONFIGURABLE_BOOLEAN:
                 return (
                     <FormControlLabel
-                        control={
-                            <Switch
-                                checked={Boolean(editValue)}
-                                onChange={(e) => setEditValue(e.target.checked)}
-                                color="primary"
-                            />
-                        }
+                        control={<Switch checked={Boolean(editValue)} onChange={(e) => setEditValue(e.target.checked)} color="primary" />}
                         label={String(editValue)}
                     />
                 );
 
             case ConfigTypes.CONFIGURABLE_INTEGER:
-                return (
-                    <NumberSpinner
-                        value={editValue as number}
-                        onValueChange={(value) => setEditValue(value ?? 0)}
-                        min={setting.minVal}
-                        max={setting.maxVal}
-                        step={setting.incVal}
-                        size="small"
-                    />
-                );
-
             case ConfigTypes.CONFIGURABLE_FLOAT:
+                const numSetting = setting as ConfigurableIntegerConfigValue | ConfigurableFloatConfigValue;
                 return (
                     <NumberSpinner
                         value={editValue as number}
                         onValueChange={(value) => setEditValue(value ?? 0)}
-                        min={setting.minVal}
-                        max={setting.maxVal}
-                        step={setting.incVal}
+                        min={numSetting.minVal}
+                        max={numSetting.maxVal}
+                        step={numSetting.incVal}
                         size="small"
                     />
                 );
 
             case ConfigTypes.CONFIGURABLE_STRING:
-                return (
-                    <TextField
-                        type="text"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        size="small"
-                        fullWidth
-                    />
-                );
+                return <TextField value={editValue} onChange={(e) => setEditValue(e.target.value)} size="small" fullWidth />;
 
             case ConfigTypes.CONFIGURABLE_ENUM:
-                if (typeof setting === 'object' && 'vals' in setting && 'valTxt' in setting) {
-                    const enumSetting = setting as ConfigurableEnumConfigValue;
-                    return (
-                        <FormControl fullWidth size="small">
-                            <Select
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value as number)}
-                            >
-                                {enumSetting.vals.map((val, idx) => (
-                                    <MenuItem key={val} value={val}>
-                                        {enumSetting.valTxt[idx]} ({val})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    );
-                }
-                return null;
+                const enumSetting = setting as ConfigurableEnumConfigValue;
+                return (
+                    <FormControl fullWidth size="small">
+                        <Select value={editValue} onChange={(e) => setEditValue(e.target.value as number)}>
+                            {enumSetting.vals.map((val, idx) => (
+                                <MenuItem key={val} value={val}>{enumSetting.valTxt[idx]} ({val})</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                );
 
             default:
                 return null;
@@ -190,7 +151,7 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                         </Typography>
                         {isEditing ? (
                             <Box sx={{ marginTop: '0.5em' }}>
-                                {renderEditInput()}
+                                {renderEditor()}
                             </Box>
                         ) : (
                             <Typography
