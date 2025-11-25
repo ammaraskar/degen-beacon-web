@@ -1,4 +1,4 @@
-import React, { useEffect, type JSX } from "react";
+import React, { useEffect, useState, type JSX } from "react";
 import type RpcInterface from "../beacon-rpc/RpcInterface";
 import type { GetSettingsResponse, Setting } from "../beacon-rpc/RpcInterface";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -9,8 +9,17 @@ import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
 import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import { ConfigTypes } from "../beacon-rpc/ConfigValue";
+import type { ConfigurableEnumConfigValue } from "../beacon-rpc/ConfigValue";
 
 export function Settings({ rpc }: { rpc: RpcInterface }) {
     const [settings, setSettings] = React.useState<GetSettingsResponse | null>(null);
@@ -43,8 +52,12 @@ export function Settings({ rpc }: { rpc: RpcInterface }) {
 }
 
 export function SettingItem({ name, setting }: { name: string, setting: Setting }): JSX.Element {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState<string | number | boolean>('');
+    
     let displayValue: string;
     let isConfigurable = false;
+    let configType: number | null = null;
 
     if (typeof setting === 'string' || typeof setting === 'number' || typeof setting === 'boolean') {
         displayValue = String(setting);
@@ -52,7 +65,104 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
         // ConfigValue
         displayValue = String(setting.cfgVal);
         isConfigurable = setting.cfgType >= ConfigTypes.CONFIGURABLE_BOOLEAN;
+        configType = setting.cfgType;
+        
+        // For enums, show the friendly label instead of the numeric value
+        if (setting.cfgType === ConfigTypes.CONFIGURABLE_ENUM) {
+            const enumSetting = setting as ConfigurableEnumConfigValue;
+            const valueIndex = enumSetting.vals.indexOf(enumSetting.cfgVal as number);
+            displayValue = enumSetting.valTxt[valueIndex];
+        }
     }
+
+    const handleEdit = () => {
+        if (typeof setting === 'object' && 'cfgVal' in setting) {
+            const val = setting.cfgVal;
+            if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+                setEditValue(val);
+            }
+        }
+        setIsEditing(true);
+    };
+
+    const handleSave = () => {
+        // TODO: Call RPC to save the value
+        console.log('Saving', name, editValue);
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+    };
+
+    const renderEditInput = () => {
+        if (!configType) return null;
+
+        switch (configType) {
+            case ConfigTypes.CONFIGURABLE_BOOLEAN:
+                return (
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={Boolean(editValue)}
+                                onChange={(e) => setEditValue(e.target.checked)}
+                                color="primary"
+                            />
+                        }
+                        label={String(editValue)}
+                    />
+                );
+            
+            case ConfigTypes.CONFIGURABLE_INTEGER:
+                return (
+                    <TextField type="number" value={editValue} size="small" fullWidth
+                        onChange={(e) => setEditValue(parseInt(e.target.value) || 0)}
+                    />
+                );
+            
+            case ConfigTypes.CONFIGURABLE_FLOAT:
+                return (
+                    <TextField
+                        type="number" value={editValue} size="small" fullWidth
+                        onChange={(e) => setEditValue(parseFloat(e.target.value) || 0)}
+                    />
+                );
+            
+            case ConfigTypes.CONFIGURABLE_STRING:
+                return (
+                    <TextField
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        size="small"
+                        fullWidth
+                    />
+                );
+            
+            case ConfigTypes.CONFIGURABLE_ENUM:
+                if (typeof setting === 'object' && 'vals' in setting && 'valTxt' in setting) {
+                    const enumSetting = setting as ConfigurableEnumConfigValue;
+                    return (
+                        <FormControl fullWidth size="small">
+                            <Select
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value as number)}
+                            >
+                                {enumSetting.vals.map((val, idx) => (
+                                    <MenuItem key={val} value={val}>
+                                        {enumSetting.valTxt[idx]} ({val})
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    );
+                }
+                return null;
+            
+            default:
+                return null;
+        }
+    };
 
     return (
         <Card elevation={1} sx={{ backgroundColor: 'background.paper' }}>
@@ -68,30 +178,70 @@ export function SettingItem({ name, setting }: { name: string, setting: Setting 
                         >
                             {name}
                         </Typography>
-                        <Typography 
-                            variant="body1" 
-                            sx={{
-                                fontFamily: 'monospace',
-                            }}
-                        >
-                            {displayValue}
-                        </Typography>
+                        {isEditing ? (
+                            <Box sx={{ marginTop: '0.5em' }}>
+                                {renderEditInput()}
+                            </Box>
+                        ) : (
+                            <Typography 
+                                variant="body1" 
+                                sx={{
+                                    fontFamily: 'monospace',
+                                }}
+                            >
+                                {displayValue}
+                            </Typography>
+                        )}
                     </Box>
                     {isConfigurable && (
                         <Stack direction="row" spacing={1} alignItems="center">
-                            <IconButton
-                                size="small"
-                                color="primary"
-                                aria-label="edit setting"
-                                sx={{
-                                    backgroundColor: 'action.hover',
-                                    '&:hover': {
-                                        backgroundColor: 'action.selected'
-                                    }
-                                }}
-                            >
-                                <EditIcon fontSize="small" />
-                            </IconButton>
+                            {isEditing ? (
+                                <>
+                                    <IconButton
+                                        size="small"
+                                        color="success"
+                                        aria-label="save setting"
+                                        onClick={handleSave}
+                                        sx={{
+                                            backgroundColor: 'action.hover',
+                                            '&:hover': {
+                                                backgroundColor: 'action.selected'
+                                            }
+                                        }}
+                                    >
+                                        <CheckIcon fontSize="small" />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        color="error"
+                                        aria-label="cancel editing"
+                                        onClick={handleCancel}
+                                        sx={{
+                                            backgroundColor: 'action.hover',
+                                            '&:hover': {
+                                                backgroundColor: 'action.selected'
+                                            }
+                                        }}
+                                    >
+                                        <CloseIcon fontSize="small" />
+                                    </IconButton>
+                                </>
+                            ) : (
+                                <IconButton
+                                    size="small"
+                                    color="primary"
+                                    aria-label="edit setting"
+                                    onClick={handleEdit}
+                                    sx={{
+                                        backgroundColor: 'action.hover',
+                                        '&:hover': {
+                                            backgroundColor: 'action.selected'
+                                        }
+                                    }}
+                                >
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+                            )}
                         </Stack>
                     )}
                 </Stack>
