@@ -4,6 +4,7 @@ import NetworkWifi from '@mui/icons-material/NetworkWifi';
 import React from 'react';
 
 import HttpRPC from '../beacon-rpc/HttpRPC.tsx';
+import { connectToBluetoothDevice } from '../beacon-rpc/BluetoothRPC.tsx';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
@@ -15,29 +16,41 @@ import Step from '@mui/material/Step';
 import StepContent from '@mui/material/StepContent';
 import StepLabel from '@mui/material/StepLabel';
 import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 import type BeaconState from '../BeaconState.tsx';
+import type RpcInterface from '../beacon-rpc/RpcInterface.tsx';
 
+type ConnectionMethod = 'wifi' | 'bluetooth';
 
 export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<React.SetStateAction<BeaconState>> }) {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [connectionMethod, setConnectionMethod] = React.useState<ConnectionMethod | null>(null);
 
-  const handleNext = () => {
+  const handleNext = (connectionMethod: ConnectionMethod) => {
+    setConnectionMethod(connectionMethod);
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleBack = () => {
+    setConnectionMethod(null);
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     setConnectButtonLoading(true);
 
-    const rpc = new HttpRPC(ipAddress);
-    rpc.getDeviceInformation().then((info) => {
-      console.log('Connected to device:', info, rpc);
-      setBeacon({ connected: true, rpc, initialDeviceInformation: info });
-    });
+    let rpc: RpcInterface;
+    if (connectionMethod === 'bluetooth') {
+      rpc = await connectToBluetoothDevice();
+    } else if (connectionMethod === 'wifi') {
+      rpc = new HttpRPC(ipAddress);
+    } else {
+      throw new Error('Invalid connection method');
+    }
+
+    const info = await rpc.getDeviceInformation();
+    console.log('Connected to device:', info, rpc);
+    setBeacon({ connected: true, rpc, initialDeviceInformation: info });
+
   };
 
   const [ipAddress, setIpAddress] = React.useState('');
@@ -65,32 +78,51 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
                   <Typography>Choose which way you would like to connect to your beacon.</Typography>
 
                   <Box sx={{ mb: 2 }}>
-                    <Button onClick={handleNext} sx={{ mt: 1, mr: 1 }} startIcon={<NetworkWifi />} variant='contained'>WiFi</Button>
-                    <Tooltip arrow title="Bluetooth connection is currently in development.">
-                      <span>
-                        <Button sx={{ mt: 1, mr: 1 }} startIcon={<Bluetooth />} disabled variant='contained'>Bluetooth</Button>
-                      </span>
-                    </Tooltip>
+                    <Button onClick={() => handleNext('wifi')} sx={{ mt: 1, mr: 1 }} startIcon={<NetworkWifi />} variant='contained'>WiFi</Button>
+                    <Button onClick={() => handleNext('bluetooth')} sx={{ mt: 1, mr: 1 }} startIcon={<Bluetooth />} variant='contained'>Bluetooth</Button>
                   </Box>
                 </StepContent>
               </Step>
               <Step key="Connect">
-                <StepLabel>Connect with WiFi</StepLabel>
+                <StepLabel>Connect {connectionMethod === 'wifi' ? 'with WiFi' : connectionMethod === 'bluetooth' ? 'with Bluetooth' : ''}</StepLabel>
                 <StepContent>
-                  <Typography>
-                    Select <b>Pair with Terminal</b> on your beacon to see its IP Address.
-                  </Typography>
-                  <Typography variant='body2'>
-                    Make sure it's on the same Network as this device.
-                  </Typography>
+                  {connectionMethod == 'wifi' && (
+                    <>
+                      <Typography>
+                        Select <b>Pair with Terminal</b> on your beacon to see its IP Address.
+                      </Typography>
+                      <Typography variant='body2'>
+                        Make sure it's on the same Network as this device.
+                      </Typography>
 
-                  <FormGroup sx={{ mt: 4 }}>
-                    <TextField value={ipAddress} onChange={handleIpAddressChange} sx={{ mt: 1, mb: 1 }} label="Beacon IP Address" variant="outlined" />
-                    <Box sx={{ mb: 2 }}>
-                      <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
-                      <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
-                    </Box>
-                  </FormGroup>
+                      <FormGroup sx={{ mt: 4 }}>
+                        <TextField value={ipAddress} onChange={handleIpAddressChange} sx={{ mt: 1, mb: 1 }} label="Beacon IP Address" variant="outlined" />
+                        <Box sx={{ mb: 2 }}>
+                          <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
+                          <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
+                        </Box>
+                      </FormGroup>
+                    </>
+                  )}
+
+                  {connectionMethod == 'bluetooth' && (
+                    <>
+                      <Typography>
+                        Select <b>Pair Bluetooth</b> on your beacon.
+                      </Typography>
+                      <Typography sx={{mt: 1}} variant='body2'>
+                        After pressing the <b>Connect</b> button, select
+                        your beacon and pair it with the PIN code shown on the beacon.
+                      </Typography>
+
+                      <FormGroup sx={{ mt: 4 }}>
+                        <Box sx={{ mb: 2 }}>
+                          <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
+                          <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
+                        </Box>
+                      </FormGroup>
+                    </>
+                  )}
                 </StepContent>
               </Step>
             </Stepper>

@@ -38,6 +38,7 @@ export function Settings({ rpc }: { rpc: RpcInterface }) {
 
     useEffect(() => {
         rpc.getSettings().then(response => {
+            console.log("Fetched settings:", response);
             setSettings(response);
         });
     }, [rpc]);
