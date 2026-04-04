@@ -24,10 +24,17 @@ export type SavedLocationsResponse = {
 export type Setting = number | string | boolean | ConfigValue;
 export type GetSettingsResponse = Record<string, Setting>;
 
+export type DisplayContentsResponse = {
+    width: number,
+    height: number,
+    buffer: string,
+}
+
 
 export default interface RpcInterface {
     getDeviceInformation(): Promise<DeviceInformation>;
     getSavedMessages(): Promise<SavedMessagesResponse>;
     getSavedLocations(): Promise<SavedLocationsResponse>;
     getSettings(): Promise<GetSettingsResponse>;
+    getDisplayContents(): Promise<DisplayContentsResponse>;
 }

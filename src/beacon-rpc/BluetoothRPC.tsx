@@ -1,6 +1,6 @@
 /// <reference types="web-bluetooth" />
 import { decode, encode } from "@msgpack/msgpack";
-import type { DeviceInformation, GetSettingsResponse, SavedLocationsResponse, SavedMessagesResponse } from "./RpcInterface";
+import type { DeviceInformation, DisplayContentsResponse, GetSettingsResponse, SavedLocationsResponse, SavedMessagesResponse } from "./RpcInterface";
 import type RpcInterface from "./RpcInterface";
 
 
@@ -79,6 +79,10 @@ class BluetoothRPC implements RpcInterface {
 
     async getSettings(): Promise<GetSettingsResponse> {
         return (await this._performRpcCall('GetSettings')) as GetSettingsResponse;
+    }
+
+    async getDisplayContents(): Promise<DisplayContentsResponse> {
+        return (await this._performRpcCall('GetDisplayContents')) as DisplayContentsResponse;
     }
 
     async _performRpcCall(functionName: string, params: any = {}): Promise<any> {

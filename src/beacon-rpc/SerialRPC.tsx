@@ -1,7 +1,7 @@
 /// <reference types="w3c-web-serial" />
 /// RPC over web serial API
 
-import type { DeviceInformation, SavedMessagesResponse, SavedLocationsResponse, GetSettingsResponse } from "./RpcInterface";
+import type { DeviceInformation, SavedMessagesResponse, SavedLocationsResponse, GetSettingsResponse, DisplayContentsResponse } from "./RpcInterface";
 import type RpcInterface from "./RpcInterface";
 
 export async function connectToSerialDevice(): Promise<SerialRPC> {
@@ -47,6 +47,10 @@ class SerialRPC implements RpcInterface {
 
     async getSettings(): Promise<GetSettingsResponse> {
         return (await this._performRpcCall('GetSettings')) as GetSettingsResponse;
+    }
+
+    async getDisplayContents(): Promise<DisplayContentsResponse> {
+        return (await this._performRpcCall('GetDisplayContents'));
     }
 
     async _performRpcCall(functionName: string, params: any = {}): Promise<any> {

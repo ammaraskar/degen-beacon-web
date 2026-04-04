@@ -13,7 +13,9 @@ import Tab from "@mui/material/Tab";
 import Message from "@mui/icons-material/Message";
 import PinDrop from "@mui/icons-material/PinDrop";
 import SystemUpdateAlt from "@mui/icons-material/SystemUpdateAlt";
+import ScreenShare from "@mui/icons-material/ScreenShare";
 import type RpcInterface from "../beacon-rpc/RpcInterface";
+import { ScreenTab } from "./ScreenTab";
 import { SavedMessages } from "./SavedMessages";
 import { SavedLocations } from "./SavedLocations";
 import { Settings as SettingsComponent } from "./Settings";
@@ -31,6 +33,7 @@ export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo:
     { icon: <PinDrop />, label: "Locations", component: <SavedLocations rpc={rpc} /> },
     { icon: <Settings />, label: "Settings", component: <SettingsComponent rpc={rpc} /> },
     { icon: <SystemUpdateAlt />, label: "Firmware", component: <Firmware deviceInfo={deviceInfo} rpc={rpc} /> },
+    { icon: <ScreenShare />, label: "Screen", component: <ScreenTab rpc={rpc} /> },
   ];
 
   return (
