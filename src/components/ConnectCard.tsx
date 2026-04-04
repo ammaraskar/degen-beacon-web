@@ -1,10 +1,12 @@
 import Card from '@mui/material/Card';
 import Bluetooth from '@mui/icons-material/Bluetooth';
 import NetworkWifi from '@mui/icons-material/NetworkWifi';
+import Usb from '@mui/icons-material/Usb';
 import React from 'react';
 
 import HttpRPC from '../beacon-rpc/HttpRPC.tsx';
 import { connectToBluetoothDevice } from '../beacon-rpc/BluetoothRPC.tsx';
+import { connectToSerialDevice } from '../beacon-rpc/SerialRPC.tsx';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
@@ -19,7 +21,7 @@ import TextField from '@mui/material/TextField';
 import type BeaconState from '../BeaconState.tsx';
 import type RpcInterface from '../beacon-rpc/RpcInterface.tsx';
 
-type ConnectionMethod = 'wifi' | 'bluetooth';
+type ConnectionMethod = 'serial' | 'wifi' | 'bluetooth';
 
 export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<React.SetStateAction<BeaconState>> }) {
   const [activeStep, setActiveStep] = React.useState(0);
@@ -41,6 +43,8 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
     let rpc: RpcInterface;
     if (connectionMethod === 'bluetooth') {
       rpc = await connectToBluetoothDevice();
+    } else if (connectionMethod == 'serial') {
+      rpc = await connectToSerialDevice();
     } else if (connectionMethod === 'wifi') {
       rpc = new HttpRPC(ipAddress);
     } else {
@@ -78,6 +82,7 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
                   <Typography>Choose which way you would like to connect to your beacon.</Typography>
 
                   <Box sx={{ mb: 2 }}>
+                    <Button onClick={() => handleNext('serial')} sx={{ mt: 1, mr: 1 }} startIcon={<Usb />} variant='contained'>Serial</Button>
                     <Button onClick={() => handleNext('wifi')} sx={{ mt: 1, mr: 1 }} startIcon={<NetworkWifi />} variant='contained'>WiFi</Button>
                     <Button onClick={() => handleNext('bluetooth')} sx={{ mt: 1, mr: 1 }} startIcon={<Bluetooth />} variant='contained'>Bluetooth</Button>
                   </Box>
@@ -86,6 +91,22 @@ export default function ConnectCard({ setBeacon }: { setBeacon: React.Dispatch<R
               <Step key="Connect">
                 <StepLabel>Connect {connectionMethod === 'wifi' ? 'with WiFi' : connectionMethod === 'bluetooth' ? 'with Bluetooth' : ''}</StepLabel>
                 <StepContent>
+                  {connectionMethod == 'serial' && (
+                    <>
+                      <Typography sx={{mt: 1}} variant='body2'>
+                        After pressing the <b>Connect</b> button, select
+                        your beacon from your USB devices.
+                      </Typography>
+
+                      <FormGroup sx={{ mt: 4 }}>
+                        <Box sx={{ mb: 2 }}>
+                          <Button onClick={handleBack} sx={{ mt: 1, mr: 1 }}>Back</Button>
+                          <Button onClick={handleConnect} sx={{ mt: 1, mr: 1 }} variant='contained' loading={connectButtonLoading}>Connect</Button>
+                        </Box>
+                      </FormGroup>
+                    </>
+                  )}
+
                   {connectionMethod == 'wifi' && (
                     <>
                       <Typography>
