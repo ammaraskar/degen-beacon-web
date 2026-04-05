@@ -33,7 +33,7 @@ export function DeviceMenu({ rpc, deviceInfo }: { rpc: RpcInterface, deviceInfo:
     { icon: <PinDrop />, label: "Locations", component: <SavedLocations rpc={rpc} /> },
     { icon: <Settings />, label: "Settings", component: <SettingsComponent rpc={rpc} /> },
     { icon: <SystemUpdateAlt />, label: "Firmware", component: <Firmware deviceInfo={deviceInfo} rpc={rpc} /> },
-    { icon: <ScreenShare />, label: "Screen", component: <ScreenTab rpc={rpc} /> },
+  { icon: <ScreenShare />, label: "Screen", component: <ScreenTab rpc={rpc} deviceInfo={deviceInfo} /> },
   ];
 
   return (

@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import type { DisplayContentsResponse } from "../beacon-rpc/RpcInterface";
 import CircularProgress from "@mui/material/CircularProgress";
 
-export function ScreenTab({ rpc }: { rpc: any }) {
+export function ScreenTab({ rpc, deviceInfo }: { rpc: any, deviceInfo: any }) {
     const [display, setDisplay] = useState<DisplayContentsResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -36,23 +36,42 @@ export function ScreenTab({ rpc }: { rpc: any }) {
         const { width, height, buffer } = display;
         const bin = atob(buffer);
         const imageData = ctx.createImageData(width, height);
-        // SSD1306: each byte is a vertical column of 8 pixels
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const byteIndex = x + Math.floor(y / 8) * width;
-                const bit = y % 8;
-                const byte = bin.charCodeAt(byteIndex);
-                const pixelOn = (byte >> bit) & 1;
-                const color = pixelOn ? 0 : 255;
-                const idx = (y * width + x) * 4;
-                imageData.data[idx + 0] = color;
-                imageData.data[idx + 1] = color;
-                imageData.data[idx + 2] = color;
-                imageData.data[idx + 3] = 255;
+        if (deviceInfo && deviceInfo.HardwareVersion === 3) {
+            // GFXcanvas1: row-major, each byte is 8 horizontal pixels, LSB is leftmost
+            const bytesPerRow = Math.ceil(width / 8);
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const byteIndex = y * bytesPerRow + (x >> 3);
+                    const bit = 7 - (x & 7);
+                    const byte = bin.charCodeAt(byteIndex);
+                    const pixelOn = (byte >> bit) & 1;
+                    const color = pixelOn ? 0 : 255;
+                    const idx = (y * width + x) * 4;
+                    imageData.data[idx + 0] = color;
+                    imageData.data[idx + 1] = color;
+                    imageData.data[idx + 2] = color;
+                    imageData.data[idx + 3] = 255;
+                }
+            }
+        } else {
+            // SSD1306: each byte is a vertical column of 8 pixels
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const byteIndex = x + Math.floor(y / 8) * width;
+                    const bit = y % 8;
+                    const byte = bin.charCodeAt(byteIndex);
+                    const pixelOn = (byte >> bit) & 1;
+                    const color = pixelOn ? 0 : 255;
+                    const idx = (y * width + x) * 4;
+                    imageData.data[idx + 0] = color;
+                    imageData.data[idx + 1] = color;
+                    imageData.data[idx + 2] = color;
+                    imageData.data[idx + 3] = 255;
+                }
             }
         }
         ctx.putImageData(imageData, 0, 0);
-    }, [display]);
+    }, [display, deviceInfo]);
 
     if (loading) return <CircularProgress />;
     if (!display) return <div>No display data</div>;
